@@ -45,18 +45,16 @@ You can help pyGAM in many ways including:
 
 To start:
 - **fork the project** and cut a new branch
-- Now **install** the testing **dependencies**
+- Now **install** the testing **dependencies**, using rye
 
 ```
-conda install cython
-pip install --upgrade pip
-pip install poetry
-poetry install --with dev
+rye pin cython@3.11
+rye sync
 ```
 
 Make some changes and write a test...
-- **Test** your contribution (eg from the `.../pyGAM`):
-```py.test -s```
+- **Test** your contribution:
+```python3 -m pytest```
 - When you are happy with your changes, make a **pull request** into the `master` branch of the main project.
 
 

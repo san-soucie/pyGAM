@@ -55,7 +55,7 @@ def test_check_X_categorical_prediction_exceeds_training(wage_X_y, wage_gam):
 def test_check_y_not_int_not_float(wage_X_y, wage_gam):
     """y must be int or float, or we should get a value error"""
     X, y = wage_X_y
-    y_str = ['hi'] * len(y)
+    y_str = ["hi"] * len(y)
 
     with pytest.raises(ValueError):
         check_y(y_str, wage_gam.link, wage_gam.distribution)
@@ -64,10 +64,10 @@ def test_check_y_not_int_not_float(wage_X_y, wage_gam):
 def test_check_y_casts_to_numerical(wage_X_y, wage_gam):
     """check_y will try to cast data to numerical types"""
     X, y = wage_X_y
-    y = y.astype('object')
+    y = y.astype("object")
 
     y = check_y(y, wage_gam.link, wage_gam.distribution)
-    assert y.dtype == 'float'
+    assert y.dtype == "float"
 
 
 def test_check_y_not_min_samples(wage_X_y, wage_gam):
@@ -95,7 +95,7 @@ def test_check_y_not_in_domain_link(default_X_y, default_gam):
 def test_check_X_not_int_not_float():
     """X  must be an in or a float"""
     with pytest.raises(ValueError):
-        check_X(['hi'], verbose=False)
+        check_X(["hi"], verbose=False)
 
 
 def test_check_X_too_many_dims():
@@ -197,11 +197,11 @@ def test_pvalue_sig_codes():
     with pytest.raises(AssertionError):
         sig_code(-1)
 
-    assert sig_code(0) == '***'
-    assert sig_code(0.00101) == '**'
-    assert sig_code(0.0101) == '*'
-    assert sig_code(0.0501) == '.'
-    assert sig_code(0.101) == ' '
+    assert sig_code(0) == "***"
+    assert sig_code(0.00101) == "**"
+    assert sig_code(0.0101) == "*"
+    assert sig_code(0.0501) == "."
+    assert sig_code(0.101) == " "
 
 
 def test_b_spline_basis_extrapolates(mcycle_X_y):
@@ -236,9 +236,7 @@ def test_no_SKSPIMPORT(mcycle_X_y):
     from pygam.utils import SKSPIMPORT
 
     if SKSPIMPORT:
-        with patch(
-            'pygam.utils.SKSPIMPORT', new=False
-        ) as SKSPIMPORT_patch:  # noqa: E501, F841
+        with patch("pygam.utils.SKSPIMPORT", new=False) as SKSPIMPORT_patch:  # noqa: E501, F841
             from pygam.utils import SKSPIMPORT
 
             assert SKSPIMPORT is False

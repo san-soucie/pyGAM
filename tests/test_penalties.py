@@ -23,13 +23,13 @@ def test_single_spline_penalty():
     monotonic_ and convexity_ should be 0.
     """
     coef = np.array(1.0)
-    assert np.alltrue(derivative(1, coef).A == 0.0)
-    assert np.alltrue(l2(1, coef).A == 1.0)
-    assert np.alltrue(monotonic_inc(1, coef).A == 0.0)
-    assert np.alltrue(monotonic_dec(1, coef).A == 0.0)
-    assert np.alltrue(convex(1, coef).A == 0.0)
-    assert np.alltrue(concave(1, coef).A == 0.0)
-    assert np.alltrue(none(1, coef).A == 0.0)
+    assert all(derivative(1, coef).A == 0.0)
+    assert all(l2(1, coef).A == 1.0)
+    assert all(monotonic_inc(1, coef).A == 0.0)
+    assert all(monotonic_dec(1, coef).A == 0.0)
+    assert all(convex(1, coef).A == 0.0)
+    assert all(concave(1, coef).A == 0.0)
+    assert all(none(1, coef).A == 0.0)
 
 
 def test_wrap_penalty():
@@ -58,7 +58,7 @@ def test_monotonic_inchepatitis_X_y(hepatitis_X_y):
     """
     X, y = hepatitis_X_y
 
-    gam = LinearGAM(terms=s(0, constraints='monotonic_inc'))
+    gam = LinearGAM(terms=s(0, constraints="monotonic_inc"))
     gam.fit(X, y)
 
     XX = gam.generate_X_grid(term=0)
@@ -73,7 +73,7 @@ def test_monotonic_dec(hepatitis_X_y):
     """
     X, y = hepatitis_X_y
 
-    gam = LinearGAM(terms=s(0, constraints='monotonic_dec'))
+    gam = LinearGAM(terms=s(0, constraints="monotonic_dec"))
     gam.fit(X, y)
 
     XX = gam.generate_X_grid(term=0)
@@ -88,7 +88,7 @@ def test_convex(hepatitis_X_y):
     """
     X, y = hepatitis_X_y
 
-    gam = LinearGAM(terms=s(0, constraints='convex'))
+    gam = LinearGAM(terms=s(0, constraints="convex"))
     gam.fit(X, y)
 
     XX = gam.generate_X_grid(term=0)
@@ -103,7 +103,7 @@ def test_concave(hepatitis_X_y):
     """
     X, y = hepatitis_X_y
 
-    gam = LinearGAM(terms=s(0, constraints='concave'))
+    gam = LinearGAM(terms=s(0, constraints="concave"))
     gam.fit(X, y)
 
     XX = gam.generate_X_grid(term=0)

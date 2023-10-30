@@ -1,0 +1,4 @@
+{
+    "ros.distro": "iron",
+    "python.defaultInterpreterPath": ".venv/bin/python3"
+}

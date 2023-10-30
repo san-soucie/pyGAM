@@ -4,6 +4,7 @@ from copy import deepcopy
 
 import numpy as np
 import pytest
+import warnings
 
 from pygam import LinearGAM, PoissonGAM
 
@@ -33,7 +34,7 @@ def chicago_gam(chicago_X_y):
 def test_wrong_length():
     """iterable params must all match lengths"""
     with pytest.raises(ValueError):
-        SplineTerm(0, lam=[0, 1, 2], penalties=['auto', 'auto'])
+        SplineTerm(0, lam=[0, 1, 2], penalties=["auto", "auto"])
 
 
 def test_num_coefs(mcycle_X_y, wage_X_y):
@@ -86,11 +87,11 @@ def test_tensor_term_expands_args_to_match_penalties_and_terms():
     assert len(tensor.lam) == 2
     assert len(flatten(tensor.lam)) == 2
 
-    tensor = te(0, 1, penalties='auto')
+    tensor = te(0, 1, penalties="auto")
     assert len(tensor.lam) == 2
     assert len(flatten(tensor.lam)) == 2
 
-    tensor = te(0, 1, penalties=['auto', ['auto', 'auto']])
+    tensor = te(0, 1, penalties=["auto", ["auto", "auto"]])
     assert len(tensor.lam) == 2
     assert len(flatten(tensor.lam)) == 3
 
@@ -190,8 +191,8 @@ def test_by_is_similar_to_tensor_with_linear_term(toy_interaction_X_y):
     gam_a = LinearGAM(te(s(0, n_splines=20), l(1))).fit(X, y)
     gam_b = LinearGAM(s(0, by=1)).fit(X, y)
 
-    r2_a = gam_a.statistics_['pseudo_r2']['explained_deviance']
-    r2_b = gam_b.statistics_['pseudo_r2']['explained_deviance']
+    r2_a = gam_a.statistics_["pseudo_r2"]["explained_deviance"]
+    r2_b = gam_b.statistics_["pseudo_r2"]["explained_deviance"]
 
     assert np.allclose(r2_a, r2_b)
 
@@ -207,18 +208,18 @@ def test_correct_smoothing_in_tensors(toy_interaction_X_y):
 
     # increase smoothing on linear function heavily, to no detriment
     gam = LinearGAM(te(0, 1, lam=[0.6, 10000])).fit(X, y)
-    assert gam.statistics_['pseudo_r2']['explained_deviance'] > 0.9
+    assert gam.statistics_["pseudo_r2"]["explained_deviance"] > 0.9
 
     #  smoothing the sinusoid function heavily reduces fit quality
     gam = LinearGAM(te(0, 1, lam=[10000, 0.6])).fit(X, y)
-    assert gam.statistics_['pseudo_r2']['explained_deviance'] < 0.1
+    assert gam.statistics_["pseudo_r2"]["explained_deviance"] < 0.1
 
 
 def test_dummy_encoding(wage_X_y, wage_gam):
     """check that dummy encoding produces fewer coefficients than one-hot"""
     X, y = wage_X_y
 
-    gam = LinearGAM(s(0) + s(1) + f(2, coding='dummy')).fit(X, y)
+    gam = LinearGAM(s(0) + s(1) + f(2, coding="dummy")).fit(X, y)
 
     assert gam._modelmat(X=X, term=2).shape[1] == 4
     assert gam.terms[2].n_coefs == 4
@@ -236,11 +237,11 @@ def test_build_cyclic_p_spline(hepatitis_X_y):
 
     # unconstrained gam
     gam = LinearGAM(s(0)).fit(X, y)
-    r_unconstrained = gam.statistics_['pseudo_r2']['explained_deviance']
+    r_unconstrained = gam.statistics_["pseudo_r2"]["explained_deviance"]
 
     # cyclic gam
-    gam = LinearGAM(s(0, basis='cp')).fit(X, y)
-    r_cyclic = gam.statistics_['pseudo_r2']['explained_deviance']
+    gam = LinearGAM(s(0, basis="cp")).fit(X, y)
+    r_cyclic = gam.statistics_["pseudo_r2"]["explained_deviance"]
 
     assert r_unconstrained > r_cyclic
 
@@ -254,7 +255,7 @@ def test_cyclic_p_spline_periodicity(hepatitis_X_y):
     """
     X, y = hepatitis_X_y
 
-    gam = LinearGAM(s(0, basis='cp')).fit(X, y)
+    gam = LinearGAM(s(0, basis="cp")).fit(X, y)
 
     # check periodicity
     left = gam.edge_knots_[0][1]
@@ -276,13 +277,13 @@ def test_cyclic_p_spline_custom_period():
     y = X > 0.5
 
     # when modeling the full period, we get close with a periodic basis
-    gam = LinearGAM(s(0, basis='cp', n_splines=4, spline_order=0)).fit(X, y)
+    gam = LinearGAM(s(0, basis="cp", n_splines=4, spline_order=0)).fit(X, y)
     assert np.allclose(gam.predict(X), y)
     assert np.allclose(gam.edge_knots_[0], [0, 1])
 
     # when modeling a non-periodic function, our periodic model fails
     gam = LinearGAM(
-        s(0, basis='cp', n_splines=4, spline_order=0, edge_knots=[0, 0.5])
+        s(0, basis="cp", n_splines=4, spline_order=0, edge_knots=[0, 0.5])
     ).fit(X, y)
     assert np.allclose(gam.predict(X), 0.5)
     assert np.allclose(gam.edge_knots_[0], [0, 0.5])
@@ -293,7 +294,7 @@ def test_tensor_terms_have_constraints(toy_interaction_X_y):
     even if those constraints are 'none'
     """
     X, y = toy_interaction_X_y
-    gam = LinearGAM(te(0, 1, constraints='none')).fit(X, y)
+    gam = LinearGAM(te(0, 1, constraints="none")).fit(X, y)
 
     assert gam._is_fitted
     assert gam.terms.hasconstraint
@@ -306,12 +307,12 @@ def test_tensor_composite_constraints_equal_penalties():
     from pygam.penalties import derivative
 
     def der1(*args, **kwargs):
-        kwargs.update({'derivative': 1})
+        kwargs.update({"derivative": 1})
         return derivative(*args, **kwargs)
 
     # create a 3D tensor where the penalty should be equal to the constraint
     term = te(
-        0, 1, 2, n_splines=[4, 5, 6], penalties=der1, lam=1, constraints='monotonic_inc'
+        0, 1, 2, n_splines=[4, 5, 6], penalties=der1, lam=1, constraints="monotonic_inc"
     )
 
     # check all the dimensions
@@ -333,24 +334,24 @@ def test_tensor_with_constraints(hepatitis_X_y):
 
     # constrain useless dimension
     gam_useless_constraint = LinearGAM(
-        te(0, 1, constraints=['none', 'monotonic_dec'], n_splines=[20, 4])
+        te(0, 1, constraints=["none", "monotonic_dec"], n_splines=[20, 4])
     )
     gam_useless_constraint.fit(X, y)
 
     # constrain informative dimension
     gam_constrained = LinearGAM(
-        te(0, 1, constraints=['monotonic_dec', 'none'], n_splines=[20, 4])
+        te(0, 1, constraints=["monotonic_dec", "none"], n_splines=[20, 4])
     )
     gam_constrained.fit(X, y)
 
-    assert gam_useless_constraint.statistics_['pseudo_r2']['explained_deviance'] > 0.5
-    assert gam_constrained.statistics_['pseudo_r2']['explained_deviance'] < 0.1
+    assert gam_useless_constraint.statistics_["pseudo_r2"]["explained_deviance"] > 0.5
+    assert gam_constrained.statistics_["pseudo_r2"]["explained_deviance"] < 0.1
 
 
 class TestRegressions(object):
     def test_no_auto_dtype(self):
         with pytest.raises(ValueError):
-            SplineTerm(feature=0, dtype='auto')
+            SplineTerm(feature=0, dtype="auto")
 
     def test_compose_penalties(self):
         """penalties should be composable, and this is done by adding all
@@ -359,8 +360,12 @@ class TestRegressions(object):
         so a term with a derivative penalty and a None penalty should be equvalent
         to a term with a derivative penalty.
         """
+        warnings.filterwarnings(
+            "ignore",
+            message="Comparing sparse matrices using == is inefficient, try using != instead.",
+        )
         base_term = SplineTerm(0)
-        term = SplineTerm(feature=0, penalties=['auto', 'none'])
+        term = SplineTerm(feature=0, penalties=["auto", "none"])
 
         # penalties should be equivalent
         assert (term.build_penalties() == base_term.build_penalties()).A.all()
@@ -378,7 +383,7 @@ class TestRegressions(object):
         X, y = hepatitis_X_y
 
         gam_compose = LinearGAM(
-            s(0, constraints=['monotonic_inc', 'monotonic_dec'])
+            s(0, constraints=["monotonic_inc", "monotonic_dec"])
         ).fit(X, y)
         gam_intercept = LinearGAM(terms=None).fit(X, y)
 
@@ -390,5 +395,5 @@ class TestRegressions(object):
         """
         X, y = chicago_X_y
 
-        gam = PoissonGAM(s(0, constraints='monotonic_inc') + te(3, 1) + s(2)).fit(X, y)
+        gam = PoissonGAM(s(0, constraints="monotonic_inc") + te(3, 1) + s(2)).fit(X, y)
         assert gam._is_fitted

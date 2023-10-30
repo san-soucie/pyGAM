@@ -85,7 +85,7 @@ def test_CustomGAM(trees_X_y):
     check that we can fit a Custom GAM on real data
     """
     X, y = trees_X_y
-    gam = GAM(distribution='gamma', link='inverse').fit(X, y)
+    gam = GAM(distribution="gamma", link="inverse").fit(X, y)
     assert gam._is_fitted
 
 
